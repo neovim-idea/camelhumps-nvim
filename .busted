@@ -1,0 +1,18 @@
+-- to make `require("camelhumps")` work as expected 
+local root = "."
+package.path = table.concat({
+  root .. "/lua/?.lua",
+  root .. "/lua/?/init.lua",
+  package.path,
+}, ";")
+
+return {
+  _all = {
+    lua = "./tests/nvim-shim",
+  },
+  default = {
+    -- coverage = true,
+    verbose = true,
+    output = "utfTerminal",
+  }
+}
