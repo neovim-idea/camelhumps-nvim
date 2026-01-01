@@ -43,4 +43,3 @@ function Utils.last_token(word)
 end
 
 return Utils
-
