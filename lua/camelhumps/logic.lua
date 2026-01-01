@@ -13,6 +13,7 @@
 local Logic = {}
 
 local u = require("camelhumps.utils")
+
 local special_chars = "()[]{},.=~!?|&+-*:/<>@#_"
 
 string.foldRight = function(the_string, zero, op)
@@ -40,7 +41,7 @@ local CharacterType = {
   SPECIAL = 4,
 }
 
-local function char_type(ch)
+function char_type(ch)
   if special_chars:find(ch, 1, true) then
     return CharacterType.SPECIAL
   elseif ch:match("^%s$") ~= nil then
@@ -190,8 +191,8 @@ function Logic.left_camel_hump()
   if result.cursor_line == -1 then
     if new_row > 1 then
       new_row = new_row - 1
-      local line_above = vim.api.nvim_buf_get_lines(0, new_row, row, true)[1]
-      new_col = math.max(#line_above - 1, 0)
+      local line_above = vim.api.nvim_buf_get_lines(0, new_row - 1, new_row, true)[1]
+      new_col = math.max(#line_above, 0)
     else
       new_col = 0
     end

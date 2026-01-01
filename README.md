@@ -17,3 +17,8 @@ Run the tests
 chmod +x run_tests.sh
 ./run_tests.sh
 ```
+
+
+## Todo
+
+- [ ] recognise enums such as `FOO_BAR_BAZ` ad jump them altogether
