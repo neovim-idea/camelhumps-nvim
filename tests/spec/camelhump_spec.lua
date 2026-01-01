@@ -32,11 +32,9 @@ describe("Logic sanity check", function()
   end
 
   it("repeatedly left_jump() should stop on the expected characters", function()
-    -- local line = read_nth_line(1)
     local line = vim.api.nvim_get_current_line()
     vim.api.nvim_win_set_cursor(0, { 1, (vim.str_utfindex(line)) })
     local expected_stops = " ]BS[O:Bs,S:f CCWMccf   "
-    -- first "jump" isn't actually a jump. We're just fetching the character at the END of the line where the cursor is.
     -- we are in INSERT mode, meaning the cursor will be positioned AFTER the last character.
     local start = char_under_cursor()
 
