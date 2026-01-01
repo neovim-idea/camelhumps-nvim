@@ -1,7 +1,7 @@
 local l = require("camelhumps.logic")
 
 local function char_under_cursor()
-  local row, col = table.unpack(vim.api.nvim_win_get_cursor(0))
+  local _, col = table.unpack(vim.api.nvim_win_get_cursor(0))
   local line = vim.api.nvim_get_current_line()
   return line:sub(col + 1, col + 1)
 end
@@ -26,11 +26,6 @@ describe("Logic sanity check", function()
     vim.cmd("startinsert")
   end)
 
-  -- NOTE: 1-based, not 0-based !
-  local function read_nth_line(line_nr)
-    return vim.api.nvim_buf_get_lines(buf, line_nr - 1, line_nr, false)[1]
-  end
-
   it("repeatedly left_jump() should stop on the expected characters", function()
     local line = vim.api.nvim_get_current_line()
     vim.api.nvim_win_set_cursor(0, { 1, (vim.str_utfindex(line)) })
@@ -39,7 +34,7 @@ describe("Logic sanity check", function()
     local start = char_under_cursor()
 
     assert.are.equal(start, "")
-    expected_stops:foldLeft({}, function(ch, acc)
+    expected_stops:foldLeft({}, function(ch, _)
       l.left_camel_hump()
       assert.are.equal(char_under_cursor(), ch)
     end)
