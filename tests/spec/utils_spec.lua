@@ -55,6 +55,112 @@ describe("Utils", function()
     end)
   end)
 
+  describe("leftmost_word(line) should return the correct word, when:", function()
+    it("line = '  final case class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx =
+        u.leftmost_word("  final case class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "final", 3 })
+    end)
+
+    it("line = 'final case class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx =
+        u.leftmost_word("final case class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "final", 1 })
+    end)
+
+    it("line = ' case class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx =
+        u.leftmost_word(" case class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "case", 2 })
+    end)
+
+    it("line = 'case class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx =
+        u.leftmost_word("case class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "case", 1 })
+    end)
+
+    it("line = ' class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word(" class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "class", 2 })
+    end)
+
+    it("line = 'class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word("class MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "class", 1 })
+    end)
+
+    it("line = ' MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word(" MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "MyWonderfulConfigClass", 2 })
+    end)
+
+    it("line = 'MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word("MyWonderfulConfigClass  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "MyWonderfulConfigClass", 1 })
+    end)
+
+    it("line = '  ( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word("  ( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "(", 3 })
+    end)
+
+    it("line = '( foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word("( foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "(", 1 })
+    end)
+
+    it("line = ' foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word(" foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "foo:", 2 })
+    end)
+
+    it("line = 'foo: String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word("foo: String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "foo:", 1 })
+    end)
+
+    it("line = ' String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word(" String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "String,", 2 })
+    end)
+
+    it("line = 'String, someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word("String, someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "String,", 1 })
+    end)
+
+    it("line = ' someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word(" someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "someBar:", 2 })
+    end)
+
+    it("line = 'someBar: Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word("someBar: Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "someBar:", 1 })
+    end)
+
+    it("line = ' Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word(" Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "Option[SomeBaz])", 2 })
+    end)
+
+    it("line = 'Option[SomeBaz]) {  '", function()
+      local res, idx = u.leftmost_word("Option[SomeBaz]) {  ")
+      assert.are.same({ res, idx }, { "Option[SomeBaz])", 1 })
+    end)
+
+    it("line = '{  '", function()
+      local res, idx = u.leftmost_word("{  ")
+      assert.are.same({ res, idx }, { "{", 1 })
+    end)
+
+    it("line = '  '", function()
+      local res, idx = u.leftmost_word("  ")
+      assert.are.same({ res, idx }, {})
+    end)
+  end)
+
   describe("last_token(word) should return the correct, last token identified, when", function()
     it("word = 'Option[SomeBaz])'", function()
       local res = u.last_token("Option[SomeBaz])")
@@ -116,13 +222,50 @@ describe("Utils", function()
       assert.are.equal(res, "doSomethingCool")
     end)
 
-    it("word = '      _ <- I_DUNNO_WHAT_IM_DOING_IN_HERE'", function()
-      local res = u.last_token("      _ <- I_DUNNO_WHAT_IM_DOING_IN_HERE")
+    it("word = 'I_DUNNO_WHAT_IM_DOING_IN_HERE'", function()
+      local res = u.last_token("I_DUNNO_WHAT_IM_DOING_IN_HERE")
       assert.are.equal(res, "HERE")
     end)
 
     it("word = '<-'", function()
       local res = u.last_token("<-")
+      assert.are.equal(res, "<-")
+    end)
+  end)
+
+  describe("first_token(word) should return the correct, last token identified, when", function()
+    it("word = 'Option[SomeBaz])'", function()
+      local res = u.first_token("Option[SomeBaz])")
+      assert.are.equal(res, "Option")
+    end)
+
+    it("word = '[SomeBaz])'", function()
+      local res = u.first_token("[SomeBaz])")
+      assert.are.equal(res, "[")
+    end)
+
+    it("word = 'SomeBaz])'", function()
+      local res = u.first_token("SomeBaz])")
+      assert.are.equal(res, "SomeBaz")
+    end)
+
+    it("word = '])'", function()
+      local res = u.first_token("])")
+      assert.are.equal(res, "])")
+    end)
+
+    it("word = 'myWonderfulConfigClass.doSomethingCool'", function()
+      local res = u.first_token("myWonderfulConfigClass.doSomethingCool")
+      assert.are.equal(res, "myWonderfulConfigClass")
+    end)
+
+    it("word = 'I_DUNNO_WHAT_IM_DOING_IN_HERE'", function()
+      local res = u.first_token("I_DUNNO_WHAT_IM_DOING_IN_HERE")
+      assert.are.equal(res, "I")
+    end)
+
+    it("word = '<-'", function()
+      local res = u.first_token("<-")
       assert.are.equal(res, "<-")
     end)
   end)

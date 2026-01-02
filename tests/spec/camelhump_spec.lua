@@ -18,7 +18,9 @@ describe("Logic sanity check:", function()
   }
 
   local test_01_expected_stops = " ]BS[O:Bs,S:f CCWMccf   "
-  -- build the other tests as an extension of the jump from the previous (upper) line
+  -- build the other tests as an extension of the jump from the previous (upper) line; while it's not strictly
+  -- necessary, it is still useful for making sure that moving upwards will still place the cursor at the right place,
+  -- thus making sure that the other jump will still work as expected
   local test_02_expected_stops = " f" .. test_01_expected_stops
   local test_03_expected_stops = "  CVb b,Iw CSd.CCWm< " .. test_02_expected_stops
   local test_04_expected_stops = " TNIb  TWH[Bc.TBo  " .. test_03_expected_stops
@@ -42,7 +44,7 @@ describe("Logic sanity check:", function()
 
       assert.are.equal(line, lines[line_nr], "sanity, to make sure we're starting from the expected line")
       assert.are.equal(start, "")
-      expected_stops:foldLeft({}, function(ch, _)
+      expected_stops:foldLeft("", function(ch, _)
         l.left_camel_hump()
         local char = char_under_cursor()
         -- if we get an empty "", it means that we went up one line, with the cursor after the last character: therefore,

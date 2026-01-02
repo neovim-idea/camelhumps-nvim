@@ -41,7 +41,7 @@ local CharacterType = {
   SPECIAL = 4,
 }
 
-function char_type(ch)
+local function char_type(ch)
   if special_chars:find(ch, 1, true) then
     return CharacterType.SPECIAL
   elseif ch:match("^%s$") ~= nil then
@@ -58,11 +58,11 @@ end
 --[[
 -- Heuristic "jump left" implementation that, assuming `line` is the content of the line where the cursor is located,
 -- starting from the beginning, up to the cursor (included):
---    1. first, it will get the rigtmost word (sequence of alphanumerical and special characters)
+--    1. first, it will get the rightmost word (sequence of alphanumerical and special characters)
 --    2. then, it will tokenize the word based on adjacent alphanumerical or special characters, and return the last one
 --    3. then, it will scan the token from last character to first, and try to find a pivot. A pivot is a charater whose
 --        type is different from the initial (= last). If there's a pivot, that's where we want to land; otherwise, just
---        land at the end of the token itself
+--        land at the beginning of the token itself
 --]]
 function Logic.jump_left(line)
   if line == nil or line:match("^%s*$") then
@@ -70,7 +70,60 @@ function Logic.jump_left(line)
   end
 
   local word, pos = u.rightmost_word(line)
-  if #word == 1 then
+  if word ~= nil and #word == 1 then
+    -- well, this is just equivalent of moving left by one with either <Left> or <h>, but:
+    --    1. hey, IJ does it too
+    --    2. if we don't do that, we effectively won't move the cursor at all, resulting in a shitty UX
+    return { cursor_col = pos - 1, cursor_line = 0 }
+  end
+
+  local token = u.last_token(word)
+
+  local zero = { position = 0, initial_character_type = nil, pivot_character_type = nil }
+  -- print("LINE: '" .. line .. "'")
+  -- print("WORD: '" .. word .. "'")
+  -- print("TOKEN: '" .. token .. "'")
+  local result = token:foldRight(zero, function(ch, acc)
+    -- print("\t* CH => " .. ch)
+    local current_character_type = char_type(ch)
+    if acc.initial_character_type == nil then
+      acc.initial_character_type = current_character_type
+      acc.position = acc.position + 1
+      return acc
+    elseif acc.initial_character_type ~= current_character_type and acc.pivot_character_type == nil then
+      acc.pivot_character_type = current_character_type
+      acc.position = acc.position + 1
+      return acc
+    elseif acc.pivot_character_type ~= nil and acc.pivot_character_type ~= current_character_type then
+      -- acc.position = acc.position + 1
+      return acc, true
+    else
+      acc.position = acc.position + 1
+      return acc
+    end
+  end)
+
+  -- print("POS: " .. pos .. ", #WORD: " .. #word .. ", result.position: " .. result.position)
+  return { cursor_col = pos + (#word - result.position), cursor_line = 0 }
+end
+
+
+--[[
+-- Heuristic "jump right" implementation that, assuming `line` is the content of the line where the cursor is located,
+-- starting from the beginning, up to the cursor (included):
+--    1. first, it will get the leftmost word (sequence of alphanumerical and special characters)
+--    2. then, it will tokenize the word based on adjacent alphanumerical or special characters, returning the first one
+--    3. then, it will scan the token from first character to last, and try to find a pivot. A pivot is a charater whose
+--        type is different from the initial (= first). If there's a pivot, that's where we want to land; otherwise, just
+--        land at the end of the token itself
+--]]
+function Logic.jump_right(line)
+  if line == nil or line:match("^%s*$") then
+    return { cursor_col = 0, cursor_line = 1 }
+  end
+
+  local word, pos = u.rightmost_word(line) -- TODO resume from here
+  if word ~= nil and  #word == 1 then
     -- well, this is just equivalent of moving left by one with either <Left> or <h>, but:
     --    1. hey, IJ does it too
     --    2. if we don't do that, we effectively won't move the cursor at all, resulting in a shitty UX
