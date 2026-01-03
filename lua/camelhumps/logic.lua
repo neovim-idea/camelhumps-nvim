@@ -28,8 +28,12 @@ string.foldRight = function(the_string, zero, op)
 end
 
 string.foldLeft = function(the_string, zero, op)
+  local should_break
   for i = 1, #the_string, 1 do
-    zero = op(the_string:sub(i, i), zero)
+    zero, should_break = op(the_string:sub(i, i), zero)
+    if should_break == true then
+      break
+    end
   end
   return zero
 end
@@ -107,7 +111,6 @@ function Logic.jump_left(line)
   return { cursor_col = pos + (#word - result.position), cursor_line = 0 }
 end
 
-
 --[[
 -- Heuristic "jump right" implementation that, assuming `line` is the content of the line where the cursor is located,
 -- starting from the beginning, up to the cursor (included):
@@ -118,36 +121,42 @@ end
 --        land at the end of the token itself
 --]]
 function Logic.jump_right(line)
+  -- print("------------------------------------")
   if line == nil or line:match("^%s*$") then
     return { cursor_col = 0, cursor_line = 1 }
   end
 
-  local word, pos = u.rightmost_word(line) -- TODO resume from here
-  if word ~= nil and  #word == 1 then
-    -- well, this is just equivalent of moving left by one with either <Left> or <h>, but:
+  local word, pos = u.leftmost_word(line)
+  if word ~= nil and #word == 1 then
+    -- well, this is just equivalent of moving right by one with either <Right> or <l>, but:
     --    1. hey, IJ does it too
     --    2. if we don't do that, we effectively won't move the cursor at all, resulting in a shitty UX
-    return { cursor_col = pos - 1, cursor_line = 0 }
+    return { cursor_col = pos + 1, cursor_line = 0 }
   end
 
-  local token = u.last_token(word)
-
-  local zero = { position = 0, initial_character_type = nil, pivot_character_type = nil }
+  local token = u.first_token(word)
+  -- if the token is composed of one uppercase character follwed by consecutive alphanumerical, lowercase chars: jump to
+  -- the end of that subtoken. i.e. `MyCoolClass` -> `CoolClass` -> `Class`
+  local start_index, match = word:match("^()(%u[%l%d]+)")
   -- print("LINE: '" .. line .. "'")
   -- print("WORD: '" .. word .. "'")
   -- print("TOKEN: '" .. token .. "'")
-  local result = token:foldRight(zero, function(ch, acc)
+  -- print("MATCH: '" .. (match or "N/A") .. "'")
+  if match then
+    local end_index = start_index + #match - 1
+    return { cursor_col = pos + end_index, cursor_line = 0 }
+  end
+
+  local zero = { position = 0, initial_character_type = nil, pivot_character_type = nil }
+  local result = token:foldLeft(zero, function(ch, acc)
     -- print("\t* CH => " .. ch)
     local current_character_type = char_type(ch)
     if acc.initial_character_type == nil then
       acc.initial_character_type = current_character_type
       acc.position = acc.position + 1
       return acc
-    elseif acc.initial_character_type ~= current_character_type and acc.pivot_character_type == nil then
+    elseif acc.initial_character_type ~= current_character_type then
       acc.pivot_character_type = current_character_type
-      acc.position = acc.position + 1
-      return acc
-    elseif acc.pivot_character_type ~= nil and acc.pivot_character_type ~= current_character_type then
       -- acc.position = acc.position + 1
       return acc, true
     else
@@ -157,73 +166,7 @@ function Logic.jump_right(line)
   end)
 
   -- print("POS: " .. pos .. ", #WORD: " .. #word .. ", result.position: " .. result.position)
-  return { cursor_col = pos + (#word - result.position), cursor_line = 0 }
-end
-
-local function right_camel_hump(line)
-  -- empty line? then jump down one line
-  if line == nil or line == "" or #line <= 1 then
-    return { cursor_col = nil, cursor_line = 1 }
-  end
-
-  local result = line:foldLeft(
-    { start_type = nil, pivot_type = nil, counter = 0, extra_search = false },
-    function(ch, acc)
-      local new_type = char_type(ch)
-      -- initialise the starting type of the character we are
-      if acc.start_type == nil then
-        acc.start_type = new_type
-        acc.counter = acc.counter + 1
-        return acc
-      end
-
-      -- if we don't have encountered a pivot character yet ...
-      if acc.pivot_type == nil then
-        -- and new_type is different than start_type => we found the pivot
-        if new_type ~= acc.start_type and new_type == CharacterType.WHITESPACE then
-          -- but, in case the pivot is a whitespace .. continue searching for a different pivot
-          acc.start_type = new_type
-        elseif new_type ~= acc.start_type then
-          acc.pivot_type = new_type
-        end
-        -- in any case, don't forget to increase the counter and return
-        acc.counter = acc.counter + 1
-        return acc
-      end
-
-      -- -- keep iterating if we hit lowercase -> uppercase transition or viceversa
-      -- if
-      --   (
-      --     (
-      --       acc.start_type == CharacterType.LOWERCASE
-      --       and acc.pivot_type == CharacterType.UPPERCASE
-      --       and acc.pivot_type == new_type
-      --     )
-      --     or (
-      --       acc.start_type == CharacterType.UPPERCASE
-      --       and acc.pivot_type == CharacterType.LOWERCASE
-      --       and acc.pivot_type == new_type
-      --     )
-      --   ) and acc.extra_search == false
-      -- then
-      --   acc.counter = acc.counter + 1
-      -- end
-
-      return acc
-    end
-  )
-
-  local final_position = { cursor_col = result.counter, cursor_line = 0 }
-  print(
-    "LINE: '"
-      .. tostring(line)
-      .. "', JUMP_TO: '"
-      .. tostring(result.counter)
-      .. "', JUMP_TO: '"
-      .. tostring(line:sub(0, final_position.cursor_col))
-      .. "'"
-  )
-  return final_position
+  return { cursor_col = pos + result.position, cursor_line = 0 }
 end
 
 -- TODO: should I add special logic to treat enumeration items as a text that can be jumped as a whole?
