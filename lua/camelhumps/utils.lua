@@ -14,12 +14,12 @@ end
 -- return it, along with its starting index.
 --]]
 function Utils.leftmost_word(line)
-    local start_index, word = line:match("^%s*()(%S+)")
-    if not word then
-        return nil, nil
-    end
-    -- local ending_index = start_index + #word - 1
-    return word, start_index
+  local start_index, word = line:match("^%s*()(%S+)")
+  if not word then
+    return nil, nil
+  end
+  -- local ending_index = start_index + #word - 1
+  return word, start_index
 end
 
 --[[
@@ -64,10 +64,6 @@ function Utils.first_token(word)
   local i = 1
   local len = #word
 
-  if len == 0 then
-    return nil
-  end
-
   local c = word:sub(i, i)
   local j = i
 
@@ -85,4 +81,5 @@ function Utils.first_token(word)
 
   return word:sub(i, j - 1)
 end
+
 return Utils
