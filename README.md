@@ -23,4 +23,4 @@ chmod +x run_tests.sh
 
 - [ ] recognise enums such as `FOO_BAR_BAZ` ad jump them altogether
 - [ ] have a round of checks on the tests and make sure to document behaviours diverging from IntelliJ
-- [ ] make `run_tests.sh` work offline: test if busted is installed, then install
+- [x] make `run_tests.sh` detect if deps are already installed and, if so, skip the process
