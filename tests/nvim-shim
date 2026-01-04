@@ -1,8 +1,18 @@
 #!/usr/bin/env sh
-LUADIR="$(brew --prefix luajit)"
-# Make LuaRocks (5.1 tree) visible to the Neovim process
-eval "$(luarocks --lua-dir="$LUADIR" --lua-version=5.1 --tree="$(pwd)/.rocks" path --bin)"
+set -e
 
-exec nvim --headless -u tests/minimal_init.lua \
-  --cmd 'set loadplugins' \
-  -l "$@"
+# Detect if brew exists and find if it has lua installed; otherwise we assume it is already installed on the system
+if command -v brew >/dev/null 2>&1; then
+  LUADIR="$(brew --prefix luajit)"
+else
+  LUADIR=""
+fi
+
+ROCKS_TREE="$(pwd)/.rocks"
+
+# Make LuaRocks (5.1 tree) visible to Neovim process
+# Only pass --lua-dir if LUADIR is non-empty
+eval "$(luarocks ${LUADIR:+--lua-dir="$LUADIR"} --lua-version=5.1 --tree="$ROCKS_TREE" path --bin)"
+
+# Launch Neovim headless with minimal init and passed arguments
+exec nvim --headless -u tests/minimal_init.lua --cmd 'set loadplugins' -l "$@"
