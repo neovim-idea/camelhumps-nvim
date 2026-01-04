@@ -27,10 +27,12 @@
 
 ## Usage
 
-`Control` (or `Opt`, if you're on a Mac) + `Left` (or `h`, if you're a neovim purist) to jump to the closest symbol,
-beginning of word, or uppercase character inside a word that is on the left of the current cursor position.
+Hold `Control` (or `Opt`, if you're on a Mac) + `Left` (or `h`, if you're a neovim purist) to jump to the closest symbol,
+beginning of word, or uppercase character inside a word that is on the left of the current cursor position. Use
+`<Right>` (or `l`) to move to the right, using the same logic.
 
-Change to `<Right>` (or `l`) to move to the right, using the same logic.
+Hold `Control` (or `Opt`) + `Backspace` to delete what's on the left of the cursor, using the same smart logic for the
+jump; use `Del` to delete, instead, what's on its right.
 
 
 ## Installation
@@ -69,9 +71,18 @@ In your `config` function, simply add the following lines:
 
 ```lua
 local camelhumps = require("camelhumps").setup()
-vim.keymap.set({ "n", "i", "v" }, "<M-Left>", camelhumps.left, { noremap = true, silent = true })
-vim.keymap.set({ "n", "i", "v" }, "<M-Right>", camelhumps.right, { noremap = true, silent = true })
+vim.keymap.set({ "n", "i", "v" }, "<M-Left>", camelhump.left, { noremap = true, silent = true })
+vim.keymap.set({ "n", "i", "v" }, "<M-Right>", camelhump.right, { noremap = true, silent = true })
+vim.keymap.set({ "n", "i", "v" }, "<M-BS>", camelhump.left_delete, { noremap = true, silent = true })
+vim.keymap.set({ "n", "i", "v" }, "<M-Del>", camelhump.right_delete, { noremap = true, silent = true })
 ```
+
+As you might have guessed, the plugin exposes four, high level methods:
+
+* `left()`, to move the cursor to the left
+* `right()`, to move the cursor to the right
+* `left_delete()`, to delete text on the left of the cursor
+* `right_delete()`, to delete text on the right of the cursor
 
 
 ## Development
@@ -94,6 +105,8 @@ chmod +x run_tests.sh
 
 - [ ] recognise enums such as `FOO_BAR_BAZ` ad jump them altogether
 - [ ] have a round of checks on the tests and make sure to document behaviours diverging from IntelliJ
+- [ ] `left/right{_delete}` have quite some duplicate code: make it centralized
+- [ ] wrap internal functions that are testsed into a `_private` module, and export them if `_G.testing_enabled == true`
 - [x] make `run_tests.sh` detect if deps are already installed and, if so, skip the process
 
 

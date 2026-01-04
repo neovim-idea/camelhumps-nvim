@@ -203,4 +203,50 @@ function Logic.right_camel_hump()
   vim.api.nvim_win_set_cursor(0, { new_row, new_col })
 end
 
+function Logic.left_delete()
+  local line = vim.api.nvim_get_current_line()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local row, col = cursor[1], cursor[2]
+  local left = line:sub(1, col)
+  local result = Logic.jump_left(left)
+
+  -- assume the result will return a jump in the same line
+  local new_col = result.cursor_col - 1
+  local new_row = row
+  -- and now, let's handle the case where we have to delete up to the line above
+  if result.cursor_line == -1 then
+    if new_row > 1 then
+      new_row = new_row - 1
+      local line_above = vim.api.nvim_buf_get_lines(0, new_row - 1, new_row, true)[1]
+      new_col = math.max(#line_above, 0)
+    else
+      new_col = 0
+    end
+  end
+
+  vim.api.nvim_buf_set_text(0, new_row - 1, new_col, row - 1, col, {})
+end
+
+function Logic.right_delete()
+  local line = vim.api.nvim_get_current_line()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local row, col = cursor[1], cursor[2]
+  local right = line:sub(col + 1)
+  local result = Logic.jump_right(right)
+
+  -- assume the result will return a jump in the same line
+  local new_col = col + result.cursor_col - 1
+  local new_row = row
+  -- and now, let's handle the case where we have to jump on the line below
+  if result.cursor_line == 1 then
+    local total_lines = vim.api.nvim_buf_line_count(0)
+    if new_row < total_lines then
+      new_row = new_row + 1
+    end
+    new_col = 1
+  end
+
+  vim.api.nvim_buf_set_text(0, row - 1, col, new_row - 1, new_col, {})
+end
+
 return Logic
