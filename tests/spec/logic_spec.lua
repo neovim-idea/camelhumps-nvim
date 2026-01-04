@@ -64,6 +64,10 @@ describe("Logic", function()
       assert.are.same(l.jump_right("     "), { cursor_col = 0, cursor_line = 1 })
     end)
 
+    it("should return `(0, 1)` in case the line has only one character", function()
+      assert.are.same(l.jump_right("}"), { cursor_col = 0, cursor_line = 1 })
+    end)
+
     it("should return `(7, 0)` for input string 'abcdef   '", function()
       assert.are.same(l.jump_right("abcdef   "), { cursor_col = 7, cursor_line = 0 })
     end)
