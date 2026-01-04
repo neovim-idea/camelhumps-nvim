@@ -1,6 +1,6 @@
 <div align="center">
 
-[![GitHub Tag](https://img.shields.io/github/v/tag/neovim-idea/camelhumps-nvim?sort=semver&style=for-the-badge)](https://github.com/neovim-idea/switcher-nvim/releases)
+[![GitHub Tag](https://img.shields.io/github/v/tag/neovim-idea/camelhumps-nvim?sort=semver&style=for-the-badge)](https://github.com/neovim-idea/camelhumps-nvim/releases)
 [![Lua](https://img.shields.io/badge/Lua-blue.svg?style=for-the-badge&logo=lua)](http://www.lua.org)
 [![Neovim](https://img.shields.io/badge/Neovim%200.10+-green.svg?style=for-the-badge&logo=neovim)](https://neovim.io)
 
