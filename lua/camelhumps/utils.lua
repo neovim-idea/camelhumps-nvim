@@ -18,7 +18,6 @@ function Utils.leftmost_word(line)
   if not word then
     return nil, nil
   end
-  -- local ending_index = start_index + #word - 1
   return word, start_index
 end
 
