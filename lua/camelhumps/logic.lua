@@ -115,7 +115,7 @@ end
 --        land at the end of the token itself
 --]]
 function Logic.jump_right(line)
-  if line == nil or line:match("^%s*$") then
+  if line == nil or line:match("^%s*$") or #line == 1 then
     return { cursor_col = 0, cursor_line = 1 }
   end
 
