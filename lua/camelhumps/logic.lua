@@ -84,11 +84,7 @@ function Logic.jump_left(line)
   local token = u.last_token(word)
 
   local zero = { position = 0, initial_character_type = nil, pivot_character_type = nil }
-  -- print("LINE: '" .. line .. "'")
-  -- print("WORD: '" .. word .. "'")
-  -- print("TOKEN: '" .. token .. "'")
   local result = token:foldRight(zero, function(ch, acc)
-    -- print("\t* CH => " .. ch)
     local current_character_type = char_type(ch)
     if acc.initial_character_type == nil then
       acc.initial_character_type = current_character_type
@@ -99,7 +95,6 @@ function Logic.jump_left(line)
       acc.position = acc.position + 1
       return acc
     elseif acc.pivot_character_type ~= nil and acc.pivot_character_type ~= current_character_type then
-      -- acc.position = acc.position + 1
       return acc, true
     else
       acc.position = acc.position + 1
@@ -107,13 +102,12 @@ function Logic.jump_left(line)
     end
   end)
 
-  -- print("POS: " .. pos .. ", #WORD: " .. #word .. ", result.position: " .. result.position)
   return { cursor_col = pos + (#word - result.position), cursor_line = 0 }
 end
 
 --[[
 -- Heuristic "jump right" implementation that, assuming `line` is the content of the line where the cursor is located,
--- starting from the beginning, up to the cursor (included):
+-- starting from the cursor, until the end:
 --    1. first, it will get the leftmost word (sequence of alphanumerical and special characters)
 --    2. then, it will tokenize the word based on adjacent alphanumerical or special characters, returning the first one
 --    3. then, it will scan the token from first character to last, and try to find a pivot. A pivot is a charater whose
@@ -121,7 +115,6 @@ end
 --        land at the end of the token itself
 --]]
 function Logic.jump_right(line)
-  -- print("------------------------------------")
   if line == nil or line:match("^%s*$") then
     return { cursor_col = 0, cursor_line = 1 }
   end
@@ -138,10 +131,6 @@ function Logic.jump_right(line)
   -- if the token is composed of one uppercase character follwed by consecutive alphanumerical, lowercase chars: jump to
   -- the end of that subtoken. i.e. `MyCoolClass` -> `CoolClass` -> `Class`
   local start_index, match = word:match("^()(%u[%l%d]+)")
-  -- print("LINE: '" .. line .. "'")
-  -- print("WORD: '" .. word .. "'")
-  -- print("TOKEN: '" .. token .. "'")
-  -- print("MATCH: '" .. (match or "N/A") .. "'")
   if match then
     local end_index = start_index + #match - 1
     return { cursor_col = pos + end_index, cursor_line = 0 }
@@ -149,7 +138,6 @@ function Logic.jump_right(line)
 
   local zero = { position = 0, initial_character_type = nil, pivot_character_type = nil }
   local result = token:foldLeft(zero, function(ch, acc)
-    -- print("\t* CH => " .. ch)
     local current_character_type = char_type(ch)
     if acc.initial_character_type == nil then
       acc.initial_character_type = current_character_type
@@ -157,7 +145,6 @@ function Logic.jump_right(line)
       return acc
     elseif acc.initial_character_type ~= current_character_type then
       acc.pivot_character_type = current_character_type
-      -- acc.position = acc.position + 1
       return acc, true
     else
       acc.position = acc.position + 1
@@ -165,7 +152,6 @@ function Logic.jump_right(line)
     end
   end)
 
-  -- print("POS: " .. pos .. ", #WORD: " .. #word .. ", result.position: " .. result.position)
   return { cursor_col = pos + result.position, cursor_line = 0 }
 end
 
@@ -197,7 +183,24 @@ function Logic.left_camel_hump()
 end
 
 function Logic.right_camel_hump()
-  right_camel_hump("")
+  local line = vim.api.nvim_get_current_line()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local row, col = cursor[1], cursor[2]
+  local right = line:sub(col + 1)
+  local result = Logic.jump_right(right)
+
+  -- assume the result will return a jump in the same line
+  local new_col = col + result.cursor_col - 1
+  local new_row = row
+  -- and now, let's handle the case where we have to jump on the line below
+  if result.cursor_line == 1 then
+    local total_lines = vim.api.nvim_buf_line_count(0)
+    if new_row < total_lines then
+      new_row = new_row + 1
+    end
+    new_col = 1
+  end
+  vim.api.nvim_win_set_cursor(0, { new_row, new_col })
 end
 
 return Logic
