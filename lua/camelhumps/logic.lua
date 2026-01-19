@@ -69,7 +69,7 @@ end
 --        land at the beginning of the token itself
 --]]
 function Logic.jump_left(line)
-  if line == nil or line:match("^%s*$") then
+  if line == nil or #line == 1 or line:match("^%s*$") then
     return { cursor_col = 0, cursor_line = -1 }
   end
 
