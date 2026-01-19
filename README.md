@@ -12,18 +12,17 @@
 
 </div>
 
-* [Usage](#usage)
-* [Installation](#installation)
-  * [Lazy](#lazy)
-  * [Packer](#packer)
-  * [Plug](#plug)
-* [Setup](#setup)
-* [Development](#development)
-* [Todo](#todo)
-* [Buy me a :beer:](#buy-me-a-beer)
+- [Usage](#usage)
+- [Installation](#installation)
+  - [Lazy](#lazy)
+  - [Packer](#packer)
+  - [Plug](#plug)
+- [Setup](#setup)
+- [Development](#development)
+- [Todo](#todo)
+- [Buy me a :beer:](#buy-me-a-beer)
 
 <!-- TOC -->
-
 
 ## Usage
 
@@ -34,14 +33,12 @@ beginning of word, or uppercase character inside a word that is on the left of t
 Hold `Control` (or `Opt`) + `Backspace` to delete what's on the left of the cursor, using the same smart logic for the
 jump; use `Del` to delete, instead, what's on its right.
 
-
 ## Installation
 
 ### Lazy
 
 > [!IMPORTANT]
 > The plugin must NOT be lazy loaded!
-
 
 ```lua
 {
@@ -64,7 +61,6 @@ use {
 Plug "neovim-idea/camelhumps-nvim"
 ```
 
-
 ## Setup
 
 In your `config` function, simply add the following lines:
@@ -79,11 +75,10 @@ vim.keymap.set({ "n", "i", "v" }, "<M-Del>", camelhump.right_delete, { noremap =
 
 As you might have guessed, the plugin exposes four, high level methods:
 
-* `left()`, to move the cursor to the left
-* `right()`, to move the cursor to the right
-* `left_delete()`, to delete text on the left of the cursor
-* `right_delete()`, to delete text on the right of the cursor
-
+- `left()`, to move the cursor to the left
+- `right()`, to move the cursor to the right
+- `left_delete()`, to delete text on the left of the cursor
+- `right_delete()`, to delete text on the right of the cursor
 
 ## Development
 
@@ -100,7 +95,6 @@ chmod +x run_tests.sh
 ./run_tests.sh
 ```
 
-
 ## Todo
 
 - [ ] recognise enums such as `FOO_BAR_BAZ` ad jump them altogether
@@ -109,7 +103,6 @@ chmod +x run_tests.sh
 - [ ] wrap internal functions that are testsed into a `_private` module, and export them if `_G.testing_enabled == true`
 - [x] make `run_tests.sh` detect if deps are already installed and, if so, skip the process
 
-
 ## Buy me a :beer:
 
-BTC `12CQ1L7qQvF3pPXhAgomnSfWaVkL19nV5F` 
+BTC `12CQ1L7qQvF3pPXhAgomnSfWaVkL19nV5F`

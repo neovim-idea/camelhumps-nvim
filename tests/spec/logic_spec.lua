@@ -49,6 +49,10 @@ describe("Logic", function()
     it("should return `(12, 0)` for input string 'Option[SomeBaz'", function()
       assert.are.same(l.jump_left("Option[SomeBaz"), { cursor_col = 12, cursor_line = 0 })
     end)
+
+    it("should return `(1, 0)` for input string 'f'", function()
+      assert.are.same(l.jump_left("f"), { cursor_col = 0, cursor_line = -1 })
+    end)
   end)
 
   describe("jump_right", function()
