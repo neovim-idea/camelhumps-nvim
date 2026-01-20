@@ -1,3 +1,14 @@
+## [1.0.1](https://github.com/neovim-idea/camelhumps-nvim/compare/v1.0.0...v1.0.1) (2026-01-20)
+
+### 📖 Docs
+
+* added project logo for social ([003d7b4](https://github.com/neovim-idea/camelhumps-nvim/commit/003d7b46f05f6c3b630106bebd81315a5b2201ca))
+* use proper link for the shield ([05f563a](https://github.com/neovim-idea/camelhumps-nvim/commit/05f563aa3f19fe837abd5cab2f7f5f247f688754))
+
+### 🩹 Fixes
+
+* don't crash if we're jumping left and there's a single character on the left ([d3179ca](https://github.com/neovim-idea/camelhumps-nvim/commit/d3179ca46e23ab922135982979c3d13baf6c848a))
+
 ## [1.0.0](https://github.com/neovim-idea/camelhumps-nvim/compare/...v1.0.0) (2026-01-04)
 
 ### 📖 Docs
